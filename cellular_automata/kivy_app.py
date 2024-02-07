@@ -20,11 +20,11 @@ class MyGrid(GridLayout):
         self.password = TextInput(password=True, multiline=False)
         self.add_widget(self.password)
 
-class MyApp(App):
+class CellularAutomata(App):
 
     def build(self):
         return MyGrid()
 
 
 if __name__ == '__main__':
-    MyApp().run()
+    CellularAutomata().run()
