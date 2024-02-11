@@ -9,16 +9,16 @@ class Cell(Button):
         super(Cell, self).__init__(**kwargs)
         self.state = 'normal'
         self.alive = False  # Zustand der Zelle (lebendig oder tot)
-        self.bind(on_press=self.toggle)  # Verknüpfe das Drücken des Buttons mit der toggle-Methode
+        self.bind(on_press=self.toggle)  # Verknuepfe das Druecken des Buttons mit der toggle-Methode
 
     def toggle(self, instance):
-        if app.root.modify_mode:  # Überprüfe, ob der Modify-Modus aktiviert ist
-            self.alive = not self.alive  # Ändere den Zustand der Zelle
+        if app.root.modify_mode:  # ueberpruefe, ob der Modify-Modus aktiviert ist
+            self.alive = not self.alive  # aendere den Zustand der Zelle
             self.update_color()  # Aktualisiere die Farbe der Zelle basierend auf ihrem Zustand
 
     def update_color(self):
         if self.alive:
-            self.background_color = [1, 1, 1, 1]  # Wenn die Zelle lebendig ist, setze die Hintergrundfarbe auf Weiß
+            self.background_color = [1, 1, 1, 1]  # Wenn die Zelle lebendig ist, setze die Hintergrundfarbe auf Weiss
         else:
             self.background_color = [0, 0, 0, 1]  # Wenn die Zelle tot ist, setze die Hintergrundfarbe auf Schwarz
 
@@ -55,7 +55,7 @@ class GameOfLifeGUI(BoxLayout):
 
     def update(self, dt):
         if self.running:
-            # Hier können Sie die Logik für die Aktualisierung der Zellen im Game of Life einfügen
+            # Hier koennen Sie die Logik fuer die Aktualisierung der Zellen im Game of Life einfuegen
             pass
 
     def start_stop(self, instance):
