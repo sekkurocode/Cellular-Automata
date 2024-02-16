@@ -1,4 +1,6 @@
 from kivy.app import App
+import numpy as np
+import random
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
@@ -8,7 +10,7 @@ class Cell(Button):
     def __init__(self, **kwargs):
         super(Cell, self).__init__(**kwargs)
         self.state = 'normal'
-        self.alive = False  # Zustand der Zelle (lebendig oder tot)
+        self.alive = False # Zustand der Zelle (lebendig oder tot)
         self.bind(on_press=self.toggle)  # Verknuepfe das Druecken des Buttons mit der toggle-Methode
 
     def toggle(self, instance):
@@ -46,6 +48,8 @@ class GameOfLifeGUI(BoxLayout):
         self.running = False
         self.modify_mode = False
 
+        self.game = Game() # Instanzierung Game of Life
+        
     def toggle_modify_mode(self, instance):
         self.modify_mode = not self.modify_mode
         if self.modify_mode:
@@ -53,10 +57,21 @@ class GameOfLifeGUI(BoxLayout):
         else:
             instance.background_color = [0, 0.5, 1, 1]  # Normale Hintergrundfarbe
 
-    def update(self, dt):
-        if self.running:
-            # Hier koennen Sie die Logik fuer die Aktualisierung der Zellen im Game of Life einfuegen
-            pass
+    def update(self):
+            # "Main-Funktion", Wenn running werden die Methoden zum Boardupdate und zum Gridupdate aufgerufen
+            if self.running:
+                self.game.update_board()
+                self.update_grid()
+    
+    def update_grid(self):
+        # Überprüft den Status jeder Zelle und updated den alive - Parameter mit dem Game.board Parameter (0 oder 1, beim ersten Durchlauf mit gg. Verteilung)
+        # Update der Zellfarbe, je nach Zusatnd.
+        # HIER FARBE MIT ALTER VERKNÜPFEN!!!
+        for row in range(len(self.cells)):
+            for col in range(len(self.cells[row])):
+                cell = self.cells[row][col]
+                cell.alive = self.game.board[row, col]
+                cell.update_color()
 
     def start_stop(self, instance):
         self.running = not self.running
@@ -66,7 +81,40 @@ class GameOfLifeGUI(BoxLayout):
         else:
             self.control_button.text = 'Start'
             Clock.unschedule(self.update)
+class Game():
+    def __init__(self):
+        self.numcol = 50
+        self.numrow = 50
+        self.numNeighbors = 0
+        self.board = np.random.choice([0, 1], size=(self.numrow, self.numcol), p=[0.7, 0.3])
+        self.temp_board = np.zeros([self.numrow, self.numcol]).astype(int)
 
+    def update_board(self):
+        # Wird von Update gecallt. Passt den Zustand für die nächste Generation an, speichert ein temporäres Board
+        # Regeln für Generationenübergang unten. board wird zur Kopie des temp Boards bevor dieses aauf 0 gesetzt wird.
+        for row in range(self.numrow):
+            for col in range(self.numcol):
+                if self.board[row, col]:
+                    self.numNeighbors = np.sum(self.board[max(0, row - 1):min(row + 2, self.numrow), max(0, col - 1):min(col + 2, self.numcol)]) - 1
+                else:
+                    self.numNeighbors = np.sum(self.board[max(0, row - 1):min(row + 2, self.numrow), max(0, col - 1):min(col + 2, self.numcol)])
+
+                # Hier die Regeln
+                # Ab 4 lebenden Nachbarn stirbt die Zelle an Nahrungsmangel
+                # Bei 3 Lebenden Nachbarn erwacht die zelle zum Leben
+                # Bei 2 oder weniger Nachbarn stirbt die Zelle
+                # REGEL PARAMETER IN GUI IMPLEMENTIEREN
+                if self.numNeighbors >= 4:
+                    self.temp_board[row, col] = 0
+                elif self.numNeighbors == 3:
+                    self.temp_board[row, col] = 1
+                elif self.numNeighbors <= 2:
+                    self.temp_board[row, col] = 0
+
+                self.numNeighbors = 0
+        self.board = self.temp_board.copy()
+        self.temp_board.fill(0)
+        
 class GameOfLifeApp(App):
     def build(self):
         return GameOfLifeGUI()
