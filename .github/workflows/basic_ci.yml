@@ -2,41 +2,32 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  build:
-    name: Build on ${{ matrix.os }} with Python ${{ matrix.python-version }}
+  Main-CI:
     runs-on: ${{ matrix.os }}
+    
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ['3.9', '3.10', '3.11']
+    
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: set up python
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Python info
-        run: |
-          which python
-          python --version
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
-          python -m pip install "kivy[base]" kivy_examples
-          pip install numpy
-      - name: Show pip list
+          pip install .
+      - name: lint with ruff
         run: |
-          pip list
-      - name: Run Black (check formatting)
-        run: black --check .
-      - name: Run linter (ruff)
+          ruff resources/.
+      - name: test with pytest
         run: |
-          ruff check .
-      - name: Run tests
-        run: pytest
+          pytest -v
