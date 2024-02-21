@@ -1,4 +1,3 @@
-# kivy_app.py
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -75,18 +74,62 @@ class GameOfLifeGUI(BoxLayout):
         self.info_layout.add_widget(Label(text='Powered by @Sara25s @sekkurocode @fabrice-eberle @juldimag @redibaj'))
         self.add_widget(self.info_layout)
 
+        self.modify_indicator = Label(text='', size_hint=(None, None), size=(100, 50), halign='right')
+        self.modify_indicator.canvas.before.add(Color(0.8, 0.89, 1, 1))  # Hellblaue Hintergrundfarbe
+        self.modify_indicator.canvas.before.add(Rectangle(size=self.modify_indicator.size, pos=self.modify_indicator.pos))
+        self.add_widget(self.modify_indicator)
+        
+        self.game = Game() # Instanzierung Game 
+
+    def open_menu(self, instance):
+        self.pause_game()  # Spiel pausieren und stoppen
+        content = BoxLayout(orientation='vertical')
+        modify_button = Button(text='Modify')
+        modify_button.bind(on_press=self.toggle_modify_mode)
+        content.add_widget(modify_button)
+        random_button = Button(text='Random')
+        random_button.bind(on_press=self.set_random_cells)
+        content.add_widget(random_button)
+        clear_button = Button(text='Clear')
+        clear_button.bind(on_press=self.clear_cells)
+        content.add_widget(clear_button)
+        popup = Popup(title='Menu', content=content, size_hint=(None, None), size=(200, 150))
+        popup.open()
+
     def toggle_modify_mode(self, instance):
         self.modify_mode = not self.modify_mode
         if self.modify_mode:
-            instance.background_color = [0, 0.8, 1, 1]  # Hellblaue Hintergrundfarbe, um anzuzeigen, dass Modify-Modus aktiviert ist
+            self.modify_indicator.text = '          Modify Active'
         else:
-            instance.background_color = [0, 0.5, 1, 1]  # Normale Hintergrundfarbe
+            self.modify_indicator.text = ''
+
+    def set_random_cells(self, instance):
+        for row in self.cells:
+            for cell in row:
+                cell.alive = bool(random.getrandbits(1))
+                cell.update_color()
+
+    def clear_cells(self, instance):
+        for row in self.cells:
+            for cell in row:
+                cell.alive = False
+                cell.update_color()
 
     def update(self, dt):
         if self.running:
             self.automata.update()
             self.display_grid()
 
+    def update_grid(self):
+        # Überprüft den Status jeder Zelle und updated den alive - Parameter mit dem Game.board Parameter (0 oder 1, beim ersten Durchlauf mit gg. Verteilung)
+        # Update der Zellfarbe, je nach Zusatnd.
+        # HIER FARBE MIT ALTER VERKNÜPFEN!!!
+        for row in range(len(self.cells)):
+            for col in range(len(self.cells[row])):
+                cell = self.cells[row][col]
+                cell.alive = self.game.board[row, col]
+                cell.update_color()
+    
     def start_stop(self, instance):
         self.running = not self.running
         if self.running:
@@ -96,6 +139,7 @@ class GameOfLifeGUI(BoxLayout):
         else:
             self.control_button.text = 'Start'
             Clock.unschedule(self.update)
+
 
     def step(self, instance):
         if not self.running:
@@ -129,3 +173,4 @@ class GameOfLifeApp(App):
     def build(self):
         automata = CellularAutomata(rows=20, columns=40)
         return GameOfLifeGUI(automata, self)
+
