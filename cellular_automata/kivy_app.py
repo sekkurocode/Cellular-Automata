@@ -1,8 +1,14 @@
+## -*- coding: utf-8 -*-
+
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
+import random
 
 class Cell(Button):
     def __init__(self, **kwargs):
@@ -37,21 +43,55 @@ class GameOfLifeGUI(BoxLayout):
         self.control_layout = BoxLayout(orientation='horizontal', size_hint_y=None, height=50)
         self.control_button = Button(text='Start', size_hint_x=None, width=100)
         self.control_button.bind(on_press=self.start_stop)
-        self.modify_button = Button(text='Modify', size_hint_x=None, width=100, background_color=[0, 0.5, 1, 1])
-        self.modify_button.bind(on_press=self.toggle_modify_mode)
         self.control_layout.add_widget(self.control_button)
-        self.control_layout.add_widget(self.modify_button)
+
+        self.menu_button = Button(text='Menu', size_hint_x=None, width=100)
+        self.menu_button.bind(on_press=self.open_menu)
+        self.control_layout.add_widget(self.menu_button)
+        
         self.add_widget(self.control_layout)
 
         self.running = False
         self.modify_mode = False
 
+        self.modify_indicator = Label(text='', size_hint=(None, None), size=(100, 50), halign='right')
+        self.modify_indicator.canvas.before.add(Color(0.8, 0.89, 1, 1))  # Hellblaue Hintergrundfarbe
+        self.modify_indicator.canvas.before.add(Rectangle(size=self.modify_indicator.size, pos=self.modify_indicator.pos))
+        self.add_widget(self.modify_indicator)
+
+    def open_menu(self, instance):
+        self.pause_game()  # Spiel pausieren und stoppen
+        content = BoxLayout(orientation='vertical')
+        modify_button = Button(text='Modify')
+        modify_button.bind(on_press=self.toggle_modify_mode)
+        content.add_widget(modify_button)
+        random_button = Button(text='Random')
+        random_button.bind(on_press=self.set_random_cells)
+        content.add_widget(random_button)
+        clear_button = Button(text='Clear')
+        clear_button.bind(on_press=self.clear_cells)
+        content.add_widget(clear_button)
+        popup = Popup(title='Menu', content=content, size_hint=(None, None), size=(200, 150))
+        popup.open()
+
     def toggle_modify_mode(self, instance):
         self.modify_mode = not self.modify_mode
         if self.modify_mode:
-            instance.background_color = [0, 0.8, 1, 1]  # Hellblaue Hintergrundfarbe, um anzuzeigen, dass Modify-Modus aktiviert ist
+            self.modify_indicator.text = '          Modify Active'
         else:
-            instance.background_color = [0, 0.5, 1, 1]  # Normale Hintergrundfarbe
+            self.modify_indicator.text = ''
+
+    def set_random_cells(self, instance):
+        for row in self.cells:
+            for cell in row:
+                cell.alive = bool(random.getrandbits(1))
+                cell.update_color()
+
+    def clear_cells(self, instance):
+        for row in self.cells:
+            for cell in row:
+                cell.alive = False
+                cell.update_color()
 
     def update(self, dt):
         if self.running:
@@ -67,9 +107,21 @@ class GameOfLifeGUI(BoxLayout):
             self.control_button.text = 'Start'
             Clock.unschedule(self.update)
 
+    def pause_game(self):
+        self.running = False
+        self.control_button.text = 'Start'
+        Clock.unschedule(self.update)
+
 class GameOfLifeApp(App):
     def build(self):
-        return GameOfLifeGUI()
+        # Hintergrundfarbe der GUI ändern
+        self.root = GameOfLifeGUI()
+        return self.root
+
+    def on_start(self):
+        from kivy.core.window import Window
+        # Setze die Hintergrundfarbe des Fensters auf Hellblau
+        Window.clearcolor = (0.8, 0.89, 1, 1)
 
 if __name__ == '__main__':
     app = GameOfLifeApp()
