@@ -8,19 +8,19 @@ class Cell(Button):
     def __init__(self, **kwargs):
         super(Cell, self).__init__(**kwargs)
         self.state = 'normal'
-        self.alive = False  # Zustand der Zelle (lebendig oder tot)
-        self.bind(on_press=self.toggle)  # Verknuepfe das Druecken des Buttons mit der toggle-Methode
+        self.alive = False  # State of the cell (alive or dead)
+        self.bind(on_press=self.toggle)  # Link the pressing of the button with the toggle method
 
     def toggle(self, instance):
-        if app.root.modify_mode:  # ueberpruefe, ob der Modify-Modus aktiviert ist
-            self.alive = not self.alive  # aendere den Zustand der Zelle
-            self.update_color()  # Aktualisiere die Farbe der Zelle basierend auf ihrem Zustand
+        if app.root.modify_mode:  # check whether the Modify mode is activated
+            self.alive = not self.alive  # change the state of the cell
+            self.update_color()  # Update the color of the cell based on its state
 
     def update_color(self):
         if self.alive:
-            self.background_color = [1, 1, 1, 1]  # Wenn die Zelle lebendig ist, setze die Hintergrundfarbe auf Weiss
+            self.background_color = [1, 1, 1, 1]  # If the cell is alive, set the background color to white
         else:
-            self.background_color = [0, 0, 0, 1]  # Wenn die Zelle tot ist, setze die Hintergrundfarbe auf Schwarz
+            self.background_color = [0, 0, 0, 1]  # If the cell is dead, set the background color to black
 
 class GameOfLifeGUI(BoxLayout):
     def __init__(self, **kwargs):
@@ -49,13 +49,13 @@ class GameOfLifeGUI(BoxLayout):
     def toggle_modify_mode(self, instance):
         self.modify_mode = not self.modify_mode
         if self.modify_mode:
-            instance.background_color = [0, 0.8, 1, 1]  # Hellblaue Hintergrundfarbe, um anzuzeigen, dass Modify-Modus aktiviert ist
+            instance.background_color = [0, 0.8, 1, 1]  # Light blue background color to indicate that Modify mode is activated
         else:
-            instance.background_color = [0, 0.5, 1, 1]  # Normale Hintergrundfarbe
+            instance.background_color = [0, 0.5, 1, 1]  # Normal background color
 
     def update(self, dt):
         if self.running:
-            # Hier koennen Sie die Logik fuer die Aktualisierung der Zellen im Game of Life einfuegen
+            # Here you can insert the logic for updating the cells in the Game of Life
             pass
 
     def start_stop(self, instance):
