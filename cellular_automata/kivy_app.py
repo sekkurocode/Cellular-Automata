@@ -6,6 +6,7 @@ from kivy.uix.label import Label
 from kivy.clock import Clock
 from game_of_life import CellularAutomata
 from random import random
+from kivy.graphics import Color, Rectangle
 
 class Cell(Button):
     def __init__(self, row, col, automata, app, **kwargs):
