@@ -1,3 +1,5 @@
+![image](https://github.com/sekkurocode/Cellular-Automata/assets/119047235/0bf83516-dc3a-4fd3-895c-592a7cf9ce8e)
+<br/>
 # Cellular-Automata and Emergent Structures
 The goal of this github project is the development of a python software, simulating "Cellular Automata".<br/><br/>
 **Cellular Automata** are **cells**, which usually are in one of two **states**, 0 or 1. If a cell is in the state "0" it is in the dead state, meaning it won't have any influence on the cells around it. In the "1" state cells count as alive and take effect on their environment. The state of a cell is in constant flux with every new generations or **tick** of the simulated environment. This of course depends on the **rules** imposed on the cells.<br/>
