@@ -27,7 +27,7 @@ jobs:
           pip install .
       - name: lint with ruff
         run: |
-          ruff resources/.
+          ruff cellular_automata/.
       - name: test with pytest
         run: |
           pytest -v
