@@ -1,4 +1,4 @@
-![image](https://github.com/sekkurocode/Cellular-Automata/assets/119047235/0bf83516-dc3a-4fd3-895c-592a7cf9ce8e)
+![image](https://github.com/sekkurocode/Cellular-Automata/assets/119047235/0929695b-5174-467f-b60c-d5909a569898)
 <br/>
 # Cellular-Automata and Emergent Structures
 The goal of this github project is the development of a python software, simulating "Cellular Automata".<br/><br/>
